@@ -16,43 +16,38 @@ import org.bukkit.plugin.java.JavaPlugin;
  *
  * @author Manuel Gauto
  */
-public class GHomes extends JavaPlugin{
-    
+public class GHomes extends JavaPlugin {
+
     /**
      * GHomes Version
      */
-    public static final String VERSION="0.1b";
-    
+    public static final String VERSION = "0.1b";
     /**
      * Load Plugin Manager
      */
     PluginManager pm = this.getServer().getPluginManager();
-    
     /**
      * Plugin
      */
     public GHomes plugin;
-    
-    
-    
     /**
      * Get Minecraft Logger
      */
     private Logger log = Logger.getLogger("Minecraft");
-    
+
     public void onDisable() {
-        log.log(Level.INFO, "[GHomes "+VERSION+"] Disabled!");
+        log.log(Level.INFO, "[GHomes " + VERSION + "] Disabled!");
     }
 
     public void onEnable() {
-        log.log(Level.INFO, "[GHomes "+VERSION+"] Enabled!");
-        plugin=this;
+        log.log(Level.INFO, "[GHomes " + VERSION + "] Enabled!");
+        plugin = this;
     }
-    
-    @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args){
-	CommandProcessor cp=new CommandProcessor();
-        return cp.processCommand(sender, cmd, commandLabel, args);
-}
 
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+        //CommandProcessor cp=new CommandProcessor();
+        // return cp.processCommand(sender, cmd, commandLabel, args);
+        return false;
+    }
 }
