@@ -58,6 +58,8 @@ public class MYSQLInterface {
      */
     private Logger log;
     
+    private final String PLUGIN_NAME="GHomes";
+    
     /**
      * Constructor for the MYSQLInterface
      * 
@@ -74,25 +76,36 @@ public class MYSQLInterface {
         //Load JDBC driver for MYSQL
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            log.log(Level.INFO, "[GHomes] JDBC Loaded");
+            log.log(Level.INFO, "["+PLUGIN_NAME+"] JDBC Loaded");
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(MYSQLInterface.class.getName()).log(Level.SEVERE, null, ex);
-            log.log(Level.SEVERE, "\n[GHomes] JDBC Loading Failed.");
+            log.log(Level.SEVERE, "\n["+PLUGIN_NAME+"] JDBC Loading Failed.");
         }
         
         //Generate JDBC URL
-        this.url="jdbc:mysql://"+host+":"+String.valueOf(port)+"/testdb";
+        this.url="jdbc:mysql://"+host+":"+String.valueOf(port)+"/"+Schema;
         
         //Conection to MYSQL and get Connection object
-        log.log(Level.INFO, "\n[GHomes] Connecting to MYSQL Server.");
+        log.log(Level.INFO, "\n["+PLUGIN_NAME+"] Connecting to MYSQL Server.");
         try {
+            //Initialize Connection Object
             this.connection = DriverManager.getConnection(url,user,password);
-            log.log(Level.INFO, "\n[GHomes] Connected");
+            
+            //Inefficent Concatenation :)
+            log.log(Level.INFO, "\n["+PLUGIN_NAME+"] Connected to " + host);
         } catch (SQLException ex) {
             Logger.getLogger(MYSQLInterface.class.getName()).log(Level.SEVERE, null, ex);
-            log.log(Level.SEVERE, "\n[GHomes] Connection Failed.");
+            log.log(Level.SEVERE, "\n["+PLUGIN_NAME+"] MYSQL Connection Failed.");
         }
     }
-       
+    
+    /**
+     * Returns Connection object representing the
+     * connection to the MYSQL server
+     * @return Connection to MYSQL server
+     */
+    public Connection getMYSQLConnection(){
+        return connection;
+    }   
     
 }
