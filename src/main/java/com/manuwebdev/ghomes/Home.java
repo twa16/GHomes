@@ -5,6 +5,7 @@
 package com.manuwebdev.ghomes;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 /**
@@ -19,9 +20,9 @@ public class Home {
     
     /**
      * Constructor for home
-     * @param p
-     * @param n
-     * @param loc 
+     * @param p Owner of home
+     * @param n Name for home
+     * @param loc Location of 
      */
     public Home(Player p, String n,Location loc){
         player=p;

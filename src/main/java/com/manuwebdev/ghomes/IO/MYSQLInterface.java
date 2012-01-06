@@ -9,8 +9,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.sound.sampled.Port;
-import sun.security.util.Password;
 
 /**
  *
@@ -58,6 +56,11 @@ public class MYSQLInterface {
      */
     private Logger log;
     
+    /**
+     * Prefix that will be added to table names
+     */
+    private String prefix;
+    
     private final String PLUGIN_NAME="GHomes";
     
     /**
@@ -68,10 +71,15 @@ public class MYSQLInterface {
      * @param user User to connect as
      * @param password Password to use
      * @param Schema Database to access
+     * @param log Log object used to write to the server console
+     * @param prefix Prefix to be added to the name of every table
      */
-    public MYSQLInterface(String host, int port, String user, String password, String Schema, Logger log) {
+    public MYSQLInterface(String host, int port, String user, String password, String Schema, Logger log, String prefix) {
         //Set logger for class
         this.log=log;
+        
+        //Set prefix
+        this.prefix=prefix;
         
         //Load JDBC driver for MYSQL
         try {
@@ -107,5 +115,14 @@ public class MYSQLInterface {
     public Connection getMYSQLConnection(){
         return connection;
     }   
+    
+    /**
+     * Returns the prefix that should be added to the 
+     * names of the table
+     * @return Table name prefix
+     */
+    public String getPrefix(){
+        return prefix;
+    }
     
 }
