@@ -6,6 +6,7 @@ package com.manuwebdev.ghomes;
 
 //import com.manuwebdev.ghomes.Commands.CommandProcessor;
 import com.manuwebdev.ghomes.Commands.GHomesCommandExecutor;
+import com.manuwebdev.ghomes.Configuration.ConfigurationManager;
 import com.manuwebdev.ghomes.IO.MYSQLInterface;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,14 +53,22 @@ public class GHomes extends JavaPlugin {
         //Get COnfiguration
         config = getConfig();
         
+        //Create ConfigurationManager
+        ConfigurationManager cm = new ConfigurationManager(config);
+        
         //MYSQL Configuration
         String host=config.getString("mysql-host");
         int port=config.getInt("mysql-port");
+        String user=config.getString("mysql-user");
+        String password=config.getString("mysql-password");
+        String schema=config.getString("mysql-database");
+        String prefix=config.getString("mysql-prefix");
         
         
-        MYSQLInterface mysql=new MYSQLInterface();
+        
+        MYSQLInterface mysql=new MYSQLInterface(host, port, user, password, schema, log, prefix);
         //register commandexecutor
-        GHomesCommandExecutor executor= new GHomesCommandExecutor();
+        GHomesCommandExecutor executor= new GHomesCommandExecutor(mysql);
 	getCommand("home").setExecutor(executor);
         getCommand("sethome").setExecutor(executor);
         getCommand("deletehome").setExecutor(executor);

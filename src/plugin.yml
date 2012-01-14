@@ -1,0 +1,16 @@
+ name: GHomes
+ main: com.manuwebdev.ghomes.GHomes
+ version: 0.1
+ commands:
+   sethome:
+     description: Set a Home
+     usage: /sethome
+     permission: ghomes.sethome
+     usage: |
+       /<command> [homename]
+   home:
+     description: Go to a Home
+     usage: /home
+     permission: ghomes.home
+     usage: |
+       /<command> [homename]
