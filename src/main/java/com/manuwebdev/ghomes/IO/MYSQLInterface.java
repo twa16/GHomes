@@ -78,6 +78,21 @@ public class MYSQLInterface {
         //Set logger for class
         this.log=log;
         
+        //Set Host
+        this.host=host;
+        
+        //Set port
+        this.port=port;
+        
+        //Set User
+        this.user=user;
+        
+        //Set Password
+        this.password=password;
+        
+        //Set Schema
+        this.Schema=Schema;
+        
         //Set prefix
         this.prefix=prefix;
         
@@ -87,23 +102,22 @@ public class MYSQLInterface {
             log.log(Level.INFO, "["+PLUGIN_NAME+"] JDBC Loaded");
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(MYSQLInterface.class.getName()).log(Level.SEVERE, null, ex);
-            log.log(Level.SEVERE, "\n["+PLUGIN_NAME+"] JDBC Loading Failed.");
+            log.log(Level.SEVERE, "["+PLUGIN_NAME+"] JDBC Loading Failed.");
         }
         
         //Generate JDBC URL
-        this.url="jdbc:mysql://"+host+":"+String.valueOf(port)+"/"+Schema;
-        
+        this.url="jdbc:mysql://"+host+":"+port+"/"+Schema;
         //Conection to MYSQL and get Connection object
-        log.log(Level.INFO, "\n["+PLUGIN_NAME+"] Connecting to MYSQL Server.");
+        log.log(Level.INFO, "["+PLUGIN_NAME+"] Connecting to MYSQL Server.");
         try {
             //Initialize Connection Object
             this.connection = DriverManager.getConnection(url,user,password);
             
             //Inefficent Concatenation :)
-            log.log(Level.INFO, "\n["+PLUGIN_NAME+"] Connected to " + host);
+            log.log(Level.INFO, "["+PLUGIN_NAME+"] Connected to " + host);
         } catch (SQLException ex) {
             Logger.getLogger(MYSQLInterface.class.getName()).log(Level.SEVERE, null, ex);
-            log.log(Level.SEVERE, "\n["+PLUGIN_NAME+"] MYSQL Connection Failed.");
+            log.log(Level.SEVERE, "["+PLUGIN_NAME+"] MYSQL Connection Failed.");
         }
     }
     

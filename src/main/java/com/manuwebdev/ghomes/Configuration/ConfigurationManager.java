@@ -19,6 +19,7 @@ public class ConfigurationManager {
     public ConfigurationManager(FileConfiguration config){
         this.config=config;
         if(config.getString("mysql-host")==null){
+            System.out.println(config.getString("mysql-host"));
             createConfigurationFile();
         }
     }

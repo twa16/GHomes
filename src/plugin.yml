@@ -1,6 +1,6 @@
  name: GHomes
  main: com.manuwebdev.ghomes.GHomes
- version: 0.1
+ version: 1.0
  commands:
    sethome:
      description: Set a Home
@@ -14,3 +14,34 @@
      permission: ghomes.home
      usage: |
        /<command> [homename]
+   nearbyhomes:
+     description: List nearby homes
+     usage: /nearbyhomes
+     aliases: [nearby,nb]
+     permission: ghomes.home
+     usage: |
+       /<command> [radius]
+       Example:
+         /nearbyhomes 4
+            Will show all homes within 4 blocks
+   allnearbyhomes:
+     description: List nearby homes regardless if owned
+     usage: /allnearbyhome
+     aliases: [allnearby, anb]
+     permission: ghomes.admin
+     usage: |
+       /allnearbyhomes [radius]
+   nearbyplayerhomes:
+     description: List a players nearby homes
+     usage: /nearbyplayerhomes
+     permission: ghomes.admin
+     aliases: [nearbyplayer,nbp]
+     usage: |
+       /nearbyplayerhomes [radius] [playername]
+   homelist:
+     description: List your homes
+     usage: /nearbyplayerhomes
+     permission: ghomes.home
+     usage: |
+       /homelist
+       

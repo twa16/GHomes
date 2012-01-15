@@ -5,11 +5,15 @@
 package com.manuwebdev.ghomes;
 
 //import com.manuwebdev.ghomes.Commands.CommandProcessor;
+import com.manuwebdev.ghomes.Caching.HomeCache;
 import com.manuwebdev.ghomes.Commands.GHomesCommandExecutor;
 import com.manuwebdev.ghomes.Configuration.ConfigurationManager;
+import com.manuwebdev.ghomes.IO.MYSQLActions;
 import com.manuwebdev.ghomes.IO.MYSQLInterface;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -20,18 +24,19 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class GHomes extends JavaPlugin {
 
-    /**
-     * GHomes Version
-     */
-    public static final String VERSION = "0.1b";
+    
     /**
      * Load Plugin Manager
      */
-    PluginManager pm = this.getServer().getPluginManager();
+    PluginManager pm = Bukkit.getServer().getPluginManager();
     /**
      * Plugin
      */
     public GHomes plugin;
+    /**
+     * Color to use for messsages
+     */
+    private ChatColor MessageColor=ChatColor.AQUA;
     /**
      * Get Minecraft Logger
      */
@@ -41,6 +46,11 @@ public class GHomes extends JavaPlugin {
      */
     protected FileConfiguration config;
 
+    /**
+     * GHomes Version
+     */
+    public final String VERSION =plugin.getDescription().getVersion();
+    
     public void onDisable() {
         log.log(Level.INFO, "[GHomes " + VERSION + "] Disabled!");
     }
@@ -49,28 +59,50 @@ public class GHomes extends JavaPlugin {
         //Set notification to console
         log.log(Level.INFO, "[GHomes " + VERSION + "] Enabled!");
         plugin = this;
-        
+
         //Get COnfiguration
         config = getConfig();
-        
+
         //Create ConfigurationManager
         ConfigurationManager cm = new ConfigurationManager(config);
-        
+        saveConfig();
         //MYSQL Configuration
-        String host=config.getString("mysql-host");
-        int port=config.getInt("mysql-port");
-        String user=config.getString("mysql-user");
-        String password=config.getString("mysql-password");
-        String schema=config.getString("mysql-database");
-        String prefix=config.getString("mysql-prefix");
-        
-        
-        
-        MYSQLInterface mysql=new MYSQLInterface(host, port, user, password, schema, log, prefix);
+        String host = config.getString("mysql-host");
+        int port = config.getInt("mysql-port");
+        String user = config.getString("mysql-user");
+        String password = config.getString("mysql-password");
+        String schema = config.getString("mysql-database");
+        String prefix = config.getString("mysql-prefix");
+
+
+        MYSQLInterface mysql = new MYSQLInterface(host, port, user, password, schema, log, prefix);
+
+        //Check if table exists and if it does not create it
+        MYSQLActions ma = new MYSQLActions(mysql);
+        ma.createTableIfNeeded();
+
+        //Set up Cache
+        final HomeCache hcm = new HomeCache(mysql);
+        hcm.cacheHomes();
+        log.log(Level.INFO, "[GHomes] Initial Home Caching Completed.");
+
         //register commandexecutor
-        GHomesCommandExecutor executor= new GHomesCommandExecutor(mysql);
-	getCommand("home").setExecutor(executor);
+        GHomesCommandExecutor executor = new GHomesCommandExecutor(mysql, hcm);
+        getCommand("home").setExecutor(executor);
         getCommand("sethome").setExecutor(executor);
-        getCommand("deletehome").setExecutor(executor);
+        getCommand("homelist").setExecutor(executor);
+        getCommand("nearbyhomes").setExecutor(executor);
+        getCommand("allnearbyhomes").setExecutor(executor);
+        getCommand("nearbyplayerhomes").setExecutor(executor);
+        //getCommand("deletehome").setExecutor(executor);
+
+        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+
+            public void run() {
+                hcm.cacheHomes();
+                plugin.getServer().broadcastMessage(MessageColor+"[GHomes] Homes Cached and Ready");
+            }
+        }, 600L);
+        log.log(Level.INFO,"[GHomes]Cache Update Scheduled.");
     }
 }
