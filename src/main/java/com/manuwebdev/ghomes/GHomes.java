@@ -24,7 +24,10 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class GHomes extends JavaPlugin {
 
-    
+    /**
+     * GHomes Version
+     */
+    public static final String VERSION = "1.0";
     /**
      * Load Plugin Manager
      */
@@ -46,11 +49,6 @@ public class GHomes extends JavaPlugin {
      */
     protected FileConfiguration config;
 
-    /**
-     * GHomes Version
-     */
-    public final String VERSION =plugin.getDescription().getVersion();
-    
     public void onDisable() {
         log.log(Level.INFO, "[GHomes " + VERSION + "] Disabled!");
     }
@@ -58,7 +56,10 @@ public class GHomes extends JavaPlugin {
     public void onEnable() {
         //Set notification to console
         log.log(Level.INFO, "[GHomes " + VERSION + "] Enabled!");
+        
+        //This is me
         plugin = this;
+        
 
         //Get COnfiguration
         config = getConfig();
@@ -104,5 +105,9 @@ public class GHomes extends JavaPlugin {
             }
         }, 600L);
         log.log(Level.INFO,"[GHomes]Cache Update Scheduled.");
+        
+        //Make sure verison numbers match :0
+        if(plugin.getDescription().getVersion().equals(VERSION)==false)log.log(Level.SEVERE,"Manuel Your version numbers do not match");
+        
     }
 }
