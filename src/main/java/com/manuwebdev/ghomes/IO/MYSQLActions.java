@@ -4,6 +4,7 @@
  */
 package com.manuwebdev.ghomes.IO;
 
+import com.manuwebdev.ghomes.GHomes;
 import com.manuwebdev.ghomes.Home;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -26,10 +27,12 @@ public class MYSQLActions {
 
     private MYSQLInterface mysqlInterface;
     private String TABLE_NAME;
+    private GHomes plugin;
 
-    public MYSQLActions(MYSQLInterface mysqlInterface) {
+    public MYSQLActions(MYSQLInterface mysqlInterface, GHomes plugin) {
         this.mysqlInterface = mysqlInterface;
         TABLE_NAME = mysqlInterface.getPrefix() + "HOMES";
+        this.plugin=plugin;
     }
 
     public void addHome(Home home) {
@@ -61,7 +64,7 @@ public class MYSQLActions {
             ps.setString(1, owner.getName());
             ps.setString(2, name);
             ResultSet rs = ps.executeQuery();
-            Location loc = new Location(Bukkit.getWorld(rs.getString("WORLD")), (double) rs.getInt("X"), (double) rs.getInt("Y"), (double) rs.getInt("Z"));
+            Location loc = new Location(plugin.getServer().getWorld(rs.getString("WORLD")), (double) rs.getInt("X"), (double) rs.getInt("Y"), (double) rs.getInt("Z"));
             Home home = new Home(owner, name, loc);
             return home;
         } catch (SQLException ex) {
@@ -71,9 +74,39 @@ public class MYSQLActions {
 
         return null;
     }
+    
+    public ArrayList<Home> getPlayersHomes(Player owner) {
+        //Initiate homes ArrayList
+        ArrayList<Home> homes = new ArrayList<Home>();
+
+        //Query to execute
+        final String QUERY = "SELECT * FROM " + TABLE_NAME+" WHERE OWNER=?";
+        try {
+            //prepare
+            PreparedStatement ps = (PreparedStatement) mysqlInterface.getMYSQLConnection().prepareStatement(QUERY);
+            ps.setString(1, owner.getName());
+            //execute
+            ResultSet rs = ps.executeQuery();
+            //loop through result
+            while (rs.next()) {
+                //Initiate location object with data in database
+                Location loc = new Location(plugin.getServer().getWorld(rs.getString("WORLD")), (double) rs.getInt("X"), (double) rs.getInt("Y"), (double) rs.getInt("Z"));
+                //Make home object
+                Player p=plugin.getServer().getPlayer(rs.getString("OWNER"));
+                Home home = new Home(p, rs.getString("NAME"), loc);
+                
+                //add home to list
+                homes.add(home);
+                
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(MYSQLActions.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return homes;
+    }
 
     public void deleteHome(String name, Player owner) {
-        final String QUERY = "DELETE * FROM " + TABLE_NAME + " WHERE OWNER=? AND NAME=?";
+        final String QUERY = "DELETE FROM " + TABLE_NAME + " WHERE OWNER=? AND NAME=?";
         try {
             PreparedStatement ps = (PreparedStatement) mysqlInterface.getMYSQLConnection().prepareStatement(QUERY);
             ps.setString(1, owner.getName());
@@ -104,9 +137,11 @@ public class MYSQLActions {
             //loop through result
             while (rs.next()) {
                 //Initiate location object with data in database
-                Location loc = new Location(Bukkit.getWorld(rs.getString("WORLD")), (double) rs.getInt("X"), (double) rs.getInt("Y"), (double) rs.getInt("Z"));
+                Location loc = new Location(plugin.getServer().getWorld(rs.getString("WORLD")), (double) rs.getInt("X"), (double) rs.getInt("Y"), (double) rs.getInt("Z"));
                 //Make home object
-                Home home = new Home(Bukkit.getPlayer(rs.getString("OWNER")), rs.getString("NAME"), loc);
+                Player p=plugin.getServer().getPlayer(rs.getString("OWNER"));
+                Home home = new Home(p, rs.getString("NAME"), loc);
+                
                 //add home to list
                 homes.add(home);
                 

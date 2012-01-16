@@ -8,8 +8,11 @@ import com.manuwebdev.ghomes.Caching.HomeCache;
 import com.manuwebdev.ghomes.Home;
 import com.manuwebdev.ghomes.IO.MYSQLActions;
 import com.manuwebdev.ghomes.IO.MYSQLInterface;
+import com.manuwebdev.ghomes.Import.Over9000HomesImport;
+import com.manuwebdev.Over9000HomeImport.IO.ImportingMYSQLInterface;
+import com.manuwebdev.ghomes.GHomes;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -26,6 +29,11 @@ public class GHomesCommandExecutor implements CommandExecutor {
      * Permission for /sethome
      */
     private final String SETHOME_PERMISSION="ghomes.sethome";
+    
+    /**
+     * Plugin
+     */
+    public GHomes plugin;
     
     /**
      * Permission for /home
@@ -61,10 +69,11 @@ public class GHomesCommandExecutor implements CommandExecutor {
      * Caching of homes for use with nearbyhomes
      */
     private HomeCache hcm;
-    public GHomesCommandExecutor(MYSQLInterface mysqlInterface, HomeCache hcm){
+    public GHomesCommandExecutor(MYSQLInterface mysqlInterface, HomeCache hcm, GHomes plugin){
         this.mysqlInterface=mysqlInterface;
-        mysqlActions = new MYSQLActions(this.mysqlInterface);
+        mysqlActions = new MYSQLActions(this.mysqlInterface,plugin);
         this.hcm=hcm;
+        this.plugin=plugin;
     }
     public boolean onCommand(CommandSender sender, Command cmd, String string, String[] args) {
         Player player = null;
@@ -88,6 +97,8 @@ public class GHomesCommandExecutor implements CommandExecutor {
                 if(player.hasPermission(SETHOME_PERMISSION)||player.isOp()){
                     //Create hoem obejct form user input
                     Home home = new Home(player, args[0], player.getLocation());
+                    //Delete the old home if it exists
+                    mysqlActions.deleteHome(args[0], player);
                     //Add home to the MYSQL database
                     mysqlActions.addHome(home);
                     //Add home to cache
@@ -131,7 +142,7 @@ public class GHomesCommandExecutor implements CommandExecutor {
                     // </editor-fold>
                     
                     //Get home from cache
-                    Home home=hcm.getHomeByName(args[0]);
+                    Home home=hcm.getHomeByName(args[0], player);
                     //If hoem is null then it does not exist
                     if(home != null&&home.getOwner().getName().equals(player.getName())){
                         player.teleport(home.getHomeLocation());
@@ -190,7 +201,7 @@ public class GHomesCommandExecutor implements CommandExecutor {
                     ArrayList<Home> homes=NearbyHomes.getMyNearbyHomes(player, Integer.parseInt(args[0]), hcm);
                     player.sendMessage(MessageColor+"-----Homes Within "+args[0]+" Blocks-----");
                     for(Home home:homes){
-                        player.sendMessage(MessageColor+"   "+home.getHomeName());
+                        player.sendMessage(MessageColor+"   "+home.getHomeName()+" ("+home.getHomeLocation().getBlockX()+","+home.getHomeLocation().getZ()+")");
                     }
                     
                 }
@@ -241,7 +252,7 @@ public class GHomesCommandExecutor implements CommandExecutor {
             else {
                 //check if player has permission
                 if(player.hasPermission(ADMIN_PERMISSION)||player.isOp()){
-                    ArrayList<Home> homes=NearbyHomes.getPlayersNearbyHomes(player, Integer.parseInt(args[0]), hcm, Bukkit.getPlayer(args[1]));
+                    ArrayList<Home> homes=NearbyHomes.getPlayersNearbyHomes(player, Integer.parseInt(args[0]), hcm, plugin.getServer().getPlayer(args[1]));
                     player.sendMessage(MessageColor+"-----"+args[1]+"'s Homes Within "+args[0]+" Blocks-----");
                     for(Home home:homes){
                         player.sendMessage(MessageColor+"   "+home.getHomeName());
@@ -273,6 +284,54 @@ public class GHomesCommandExecutor implements CommandExecutor {
                         player.sendMessage(MessageColor+"   "+homes.get(i).getHomeName());
                     }
                     
+                }
+                
+            }
+            return true;
+
+        }
+        // </editor-fold>
+        
+        // <editor-fold defaultstate="collapsed" desc="/import">
+        if (cmd.getName().equalsIgnoreCase("import")) { // If the player typed /sethome then do the following...
+            
+            //If player is null then the command was sent from console
+            if (player == null) {
+                sender.sendMessage("this command can only be run by a player");
+            } 
+            
+            //If player is not null a player sent it
+            else {
+                //check if player has permission
+                if(player.hasPermission(ADMIN_PERMISSION)||player.isOp()){
+                    //Import from Over9000Hoems
+                    File homesdir=new File("homes");
+                    ImportingMYSQLInterface importmysql=new ImportingMYSQLInterface();
+                    importmysql.setConnection(mysqlInterface.getMYSQLConnection());
+                    Over9000HomesImport.importHomes(importmysql,homesdir);
+                    
+                }
+                
+            }
+            return true;
+
+        }
+        // </editor-fold>
+        
+        // <editor-fold defaultstate="collapsed" desc="/ghcache">
+        if (cmd.getName().equalsIgnoreCase("ghcache")) { // If the player typed /sethome then do the following...
+            
+            //If player is null then the command was sent from console
+            if (player == null) {
+                sender.sendMessage("this command can only be run by a player");
+            } 
+            
+            //If player is not null a player sent it
+            else {
+                //check if player has permission
+                if(player.hasPermission(ADMIN_PERMISSION)||player.isOp()){
+                    hcm.cacheHomes();
+                    player.sendMessage(MessageColor+"[GHomes] Homes Recached");
                 }
                 
             }

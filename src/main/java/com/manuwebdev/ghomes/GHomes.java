@@ -79,33 +79,26 @@ public class GHomes extends JavaPlugin {
         MYSQLInterface mysql = new MYSQLInterface(host, port, user, password, schema, log, prefix);
 
         //Check if table exists and if it does not create it
-        MYSQLActions ma = new MYSQLActions(mysql);
+        MYSQLActions ma = new MYSQLActions(mysql,plugin);
         ma.createTableIfNeeded();
 
         //Set up Cache
-        final HomeCache hcm = new HomeCache(mysql);
+        final HomeCache hcm = new HomeCache(mysql, plugin);
         hcm.cacheHomes();
         log.log(Level.INFO, "[GHomes] Initial Home Caching Completed.");
 
         //register commandexecutor
-        GHomesCommandExecutor executor = new GHomesCommandExecutor(mysql, hcm);
+        GHomesCommandExecutor executor = new GHomesCommandExecutor(mysql, hcm, plugin);
         getCommand("home").setExecutor(executor);
         getCommand("sethome").setExecutor(executor);
         getCommand("homelist").setExecutor(executor);
         getCommand("nearbyhomes").setExecutor(executor);
         getCommand("allnearbyhomes").setExecutor(executor);
         getCommand("nearbyplayerhomes").setExecutor(executor);
-        //getCommand("deletehome").setExecutor(executor);
+        getCommand("deletehome").setExecutor(executor);
+        getCommand("import").setExecutor(executor);
+        getCommand("ghcache").setExecutor(executor);
 
-        plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-
-            public void run() {
-                hcm.cacheHomes();
-                plugin.getServer().broadcastMessage(MessageColor+"[GHomes] Homes Cached and Ready");
-            }
-        }, 600L);
-        log.log(Level.INFO,"[GHomes]Cache Update Scheduled.");
-        
         //Make sure verison numbers match :0
         if(plugin.getDescription().getVersion().equals(VERSION)==false)log.log(Level.SEVERE,"Manuel Your version numbers do not match");
         

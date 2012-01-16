@@ -4,6 +4,7 @@
  */
 package com.manuwebdev.ghomes.Caching;
 
+import com.manuwebdev.ghomes.GHomes;
 import com.manuwebdev.ghomes.Home;
 import com.manuwebdev.ghomes.IO.MYSQLActions;
 import com.manuwebdev.ghomes.IO.MYSQLInterface;
@@ -32,14 +33,19 @@ public class HomeCache {
     MYSQLActions mysqlActions;
     
     /**
+     * Plugin
+     */
+    GHomes plugin;
+    /**
      * Initialize Home cache and do initial caching
      *
      * @param mysql Connection to MYSQL
      */
-    public HomeCache(MYSQLInterface mysql) {
+    public HomeCache(MYSQLInterface mysql, GHomes plugin) {
         this.mysqlInterface = mysql;
-        mysqlActions=new MYSQLActions(mysqlInterface);
+        mysqlActions=new MYSQLActions(mysqlInterface,plugin);
         HomeCache = new ArrayList<Home>();
+        this.plugin=plugin;
     }
 
     /**
@@ -57,15 +63,7 @@ public class HomeCache {
      * @return Homes owned by specified player
      */
     public ArrayList<Home> getAllPlayerHomes(Player player) {
-        ArrayList<Home> homes=new ArrayList<Home>();
-        for (int i = 0; i < HomeCache.size(); i++) {
-            System.out.println("Namefromcache: "+HomeCache.get(i).getOwner());
-            System.out.println("NameFromObject: "+player.getName());
-            System.out.println("Name from Bukkit: "+Bukkit.getPlayer("twa16"));
-            if(HomeCache.get(i).getOwner().getName().equals(player.getName())){
-                homes.add(HomeCache.get(i));
-            }
-        }
+        ArrayList<Home> homes=mysqlActions.getPlayersHomes(player);
         return homes;
     }
     
@@ -74,10 +72,11 @@ public class HomeCache {
      * @param name Name to search for
      * @return Home with name or null if it doesn't exist
      */
-    public Home getHomeByName(String name){
-        for (int i = 0; i < HomeCache.size(); i++) {
-            if(HomeCache.get(i).getHomeName().equals(name)){
-                return HomeCache.get(i);
+    public Home getHomeByName(String name, Player player){
+        
+        for (int i = 0; i < mysqlActions.getPlayersHomes(player).size(); i++) {
+            if(mysqlActions.getPlayersHomes(player).get(i).getHomeName().equals(name)){
+                return mysqlActions.getPlayersHomes(player).get(i);
             }
         }
         return null;

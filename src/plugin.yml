@@ -8,6 +8,12 @@
      permission: ghomes.sethome
      usage: |
        /<command> [homename]
+   deletehome:
+     description: delete a Home
+     usage: /deletehome
+     permission: ghomes.sethome
+     usage: |
+       /<command> [homename]
    home:
      description: Go to a Home
      usage: /home
@@ -44,4 +50,16 @@
      permission: ghomes.home
      usage: |
        /homelist
+   import:
+     description: Import from over9000homes
+     usage: /import
+     permission: ghomes.admin
+     usage: |
+       /import
+   ghcache:
+     description: Recache Homes from MYSQL
+     usage: /ghcache
+     permission: ghomes.admin
+     usage: |
+       /ghcache
        
