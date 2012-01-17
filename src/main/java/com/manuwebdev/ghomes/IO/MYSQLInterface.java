@@ -79,7 +79,30 @@ public class MYSQLInterface {
      * Prefix that will be added to table names
      */
     private String prefix;
+   
+    /**
+     * Connection Manager MYSQL key
+     */
+    public static final String DATABASE_USER = "user";
     
+    /**
+     * Connection Manager MYSQL key
+     */
+    public static final String DATABASE_PASSWORD = "password";
+    
+    /**
+     * MYSQL autoReconnect
+     */
+    public static final String MYSQL_AUTO_RECONNECT = "autoReconnect";
+    
+    /**
+     * Maxrecconect key
+     */
+    public static final String MYSQL_MAX_RECONNECTS = "maxReconnects";
+    
+    /**
+     * Name of plugins
+     */
     private final String PLUGIN_NAME="GHomes";
     
     /**
@@ -124,13 +147,23 @@ public class MYSQLInterface {
             log.log(Level.SEVERE, "["+PLUGIN_NAME+"] JDBC Loading Failed.");
         }
         
+        java.util.Properties connProperties = new java.util.Properties();
+
+         connProperties.put(DATABASE_USER, user);
+         
+         connProperties.put(DATABASE_PASSWORD, password);
+
+         connProperties.put(MYSQL_AUTO_RECONNECT, "true");
+
+         connProperties.put(MYSQL_MAX_RECONNECTS, "4");
+        
         //Generate JDBC URL
         this.url="jdbc:mysql://"+host+":"+port+"/"+Schema;
         //Conection to MYSQL and get Connection object
         log.log(Level.INFO, "["+PLUGIN_NAME+"] Connecting to MYSQL Server.");
         try {
             //Initialize Connection Object
-            this.connection = DriverManager.getConnection(url,user,password);
+            this.connection = DriverManager.getConnection(url,connProperties);
             
             //Inefficent Concatenation :)
             log.log(Level.INFO, "["+PLUGIN_NAME+"] Connected to " + host);
