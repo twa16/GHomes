@@ -29,6 +29,8 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
+
 /**
  *
  * @author Manuel Gauto
@@ -155,7 +157,7 @@ public class MYSQLInterface {
 
          connProperties.put(MYSQL_AUTO_RECONNECT, "true");
 
-         connProperties.put(MYSQL_MAX_RECONNECTS, "4");
+         connProperties.put(MYSQL_MAX_RECONNECTS, "40000");
         
         //Generate JDBC URL
         this.url="jdbc:mysql://"+host+":"+port+"/"+Schema;
@@ -190,5 +192,4 @@ public class MYSQLInterface {
     public String getPrefix(){
         return prefix;
     }
-    
 }
