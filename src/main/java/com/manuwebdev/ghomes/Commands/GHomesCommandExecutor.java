@@ -274,7 +274,7 @@ public class GHomesCommandExecutor implements CommandExecutor {
                     ArrayList<Home> homes=NearbyHomes.getPlayersNearbyHomes(player, Integer.parseInt(args[0]), hcm, plugin.getServer().getPlayer(args[1]));
                     player.sendMessage(MessageColor+"-----"+args[1]+"'s Homes Within "+args[0]+" Blocks-----");
                     for(Home home:homes){
-                        player.sendMessage(MessageColor+"   "+home.getHomeName());
+                        player.sendMessage(MessageColor+"   "+home.getHomeName()+"--"+home.getOwnerName());
                     }
                     
                 }

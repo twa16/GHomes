@@ -31,6 +31,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
@@ -51,7 +52,7 @@ public class MYSQLActions {
     public MYSQLActions(MYSQLInterface mysqlInterface, GHomes plugin) {
         this.mysqlInterface = mysqlInterface;
         TABLE_NAME = mysqlInterface.getPrefix() + "HOMES";
-        this.plugin=plugin;
+        this.plugin = plugin;
     }
 
     public void addHome(Home home) {
@@ -93,13 +94,13 @@ public class MYSQLActions {
 
         return null;
     }
-    
+
     public ArrayList<Home> getPlayersHomes(Player owner) {
         //Initiate homes ArrayList
         ArrayList<Home> homes = new ArrayList<Home>();
 
         //Query to execute
-        final String QUERY = "SELECT * FROM " + TABLE_NAME+" WHERE OWNER=?";
+        final String QUERY = "SELECT * FROM " + TABLE_NAME + " WHERE OWNER=?";
         try {
             //prepare
             PreparedStatement ps = (PreparedStatement) mysqlInterface.getMYSQLConnection().prepareStatement(QUERY);
@@ -111,12 +112,12 @@ public class MYSQLActions {
                 //Initiate location object with data in database
                 Location loc = new Location(plugin.getServer().getWorld(rs.getString("WORLD")), (double) rs.getInt("X"), (double) rs.getInt("Y"), (double) rs.getInt("Z"));
                 //Make home object
-                Player p=plugin.getServer().getPlayer(rs.getString("OWNER"));
+                Player p = getPlayer(rs.getString("OWNER"));
                 Home home = new Home(p, rs.getString("NAME"), loc);
-                
+
                 //add home to list
                 homes.add(home);
-                
+
             }
         } catch (SQLException ex) {
             Logger.getLogger(MYSQLActions.class.getName()).log(Level.SEVERE, null, ex);
@@ -158,12 +159,12 @@ public class MYSQLActions {
                 //Initiate location object with data in database
                 Location loc = new Location(plugin.getServer().getWorld(rs.getString("WORLD")), (double) rs.getInt("X"), (double) rs.getInt("Y"), (double) rs.getInt("Z"));
                 //Make home object
-                Player p=plugin.getServer().getPlayer(rs.getString("OWNER"));
+                Player p = getPlayer(rs.getString("OWNER"));
                 Home home = new Home(p, rs.getString("NAME"), loc);
-                
+                home.setOwnerName(rs.getString("OWNER"));
                 //add home to list
                 homes.add(home);
-                
+
             }
         } catch (SQLException ex) {
             Logger.getLogger(MYSQLActions.class.getName()).log(Level.SEVERE, null, ex);
@@ -195,8 +196,8 @@ public class MYSQLActions {
                 Statement stmt = mysqlInterface.getMYSQLConnection().createStatement();
 
                 String sql = "CREATE TABLE " + TABLE_NAME + "("
-                        + "OWNER             VARCHAR(254), " 
-                        + "NAME              VARCHAR(254), " 
+                        + "OWNER             VARCHAR(254), "
+                        + "NAME              VARCHAR(254), "
                         + "X                 INTEGER, "
                         + "Y                 INTEGER, "
                         + "Z                 INTEGER, "
@@ -206,6 +207,15 @@ public class MYSQLActions {
             } catch (SQLException e) {
                 //NOM NOM NOM
             }
+        }
+    }
+
+    public static Player getPlayer(String name) {
+        Player player = Bukkit.getServer().getPlayer(name);
+        if (player == null) {
+            return Bukkit.getServer().getOfflinePlayer(name).getPlayer();
+        } else {
+            return player;
         }
     }
 }

@@ -36,6 +36,7 @@ public class Home {
     private Player player;
     private Location location;
     private String name;
+    private String ownername;
     
     /**
      * Constructor for home
@@ -48,6 +49,8 @@ public class Home {
         name=n;
         location=loc;
     }
+    
+    
     
     /**
      * Returns the Player who owns the home
@@ -71,6 +74,23 @@ public class Home {
      */
     public String getHomeName(){
         return name;
+    }
+    
+    public void setOwnerName(String name){
+        ownername=name;
+    }
+    
+    /**
+     * 
+     * @return 
+     */
+    public String getOwnerName(){
+        if(ownername !=null){
+            return ownername;
+        }
+        else{
+            return player.getName();
+        }
     }
     
     
